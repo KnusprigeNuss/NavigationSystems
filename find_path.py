@@ -90,7 +90,7 @@ def getNeighbors(node):
         times.append(arclist['time'][i])
 
     # return different cost function based on the user input
-    if choice == 1 or choice == 3 or choice == 4:
+    if choice == 1 or choice == 4:
         return neighbors, times
     else:
         return neighbors, distances
@@ -124,7 +124,7 @@ def main():
             choice = str(input("Enter a number (1-5): "))
             if choice in ["1", "2", "3", "4", "5"]:
                 choice = int(choice)
-                if choice is not 5:
+                if choice != 5:
                     print("Calculating the dijkstra algorithm for option ", choice)
                 break
             else:
