@@ -124,7 +124,8 @@ def main():
             choice = str(input("Enter a number (1-5): "))
             if choice in ["1", "2", "3", "4", "5"]:
                 choice = int(choice)
-                print("Calculating the dijkstra algorithm for option ", choice)
+                if choice is not 5:
+                    print("Calculating the dijkstra algorithm for option ", choice)
                 break
             else:
                 print("Enter a number between 1 and 5")
