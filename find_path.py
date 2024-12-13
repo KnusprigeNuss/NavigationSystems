@@ -88,7 +88,7 @@ def getNeighbors(node):
         times.append(arclist['time'][i])
 
     # return different cost function based on the user input
-    if choice == 1 or choice == 3 or choice == 4:
+    if choice == 1 or choice == 4:
         return neighbors, times
     else:
         return neighbors, distances
