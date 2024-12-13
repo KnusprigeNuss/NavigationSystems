@@ -1,9 +1,6 @@
 import heapq
 
 import pandas as pd
-import cartopy.crs as ccrs
-import cartopy.io.img_tiles as cimgt
-import matplotlib.pyplot as plt
 import folium
 
 # read in the files and prepare them as dataframes
@@ -40,10 +37,11 @@ def distance_update(i, neighbor, node_min_cost, graph, cost):
     if choice == 3:
         if arclist.loc[neighbor, 'flags'] < 4 or arclist.loc[neighbor, 'speedlimit'] > 50:
             cost[i] = cost[i] + 10000
-    # cars try not to drive on pedestrian and/or bike streets
+    # cars try not to drive on pedestrian and/or bike streets and try to drive not on "small" streets
     if choice == 4:
         if arclist.loc[neighbor, 'flags'] == 2 or arclist.loc[neighbor, 'flags'] == 4 or arclist.loc[
-            neighbor, 'flags'] == 6:
+            neighbor, 'flags'] == 6 or arclist.loc[neighbor, 'clazz'] == 31 or arclist.loc[neighbor, 'clazz'] == 41 or \
+                arclist.loc[neighbor, 'clazz'] == 43:
             cost[i] = cost[i] + 10000
 
     alternative_distance = graph[node_min_cost]['cost'] + cost[i]
@@ -99,13 +97,15 @@ def getNeighbors(node):
 def find_path(graph, end):
     # just go from the end node back to the start node
     path = []
+    cost = []
     current_node = end
     while current_node is not None:
         path.append(current_node)
+        cost.append(graph[current_node]['cost'])
         current_node = graph[current_node]['predecessor']
     # We get our path from the start node
     path.reverse()
-    return path
+    return path, cost
 
 
 def main():
@@ -124,7 +124,7 @@ def main():
             choice = str(input("Enter a number (1-5): "))
             if choice in ["1", "2", "3", "4", "5"]:
                 choice = int(choice)
-                if choice is not 5:
+                if choice != 5:
                     print("Calculating the dijkstra algorithm for option ", choice)
                 break
             else:
@@ -137,11 +137,12 @@ def main():
         best_paths.append(find_path(graph, 9328))
         best_paths.append(find_path(graph, 6031))
         best_paths.append(find_path(graph, 8543))
-        m = folium.Map(location=(nodepl.loc[start, "long"], nodepl.loc[start, "lat"]), zoom_start=15)
 
+
+        m = folium.Map(location=(nodepl.loc[start, "long"], nodepl.loc[start, "lat"]), zoom_start=15)
         for best_path in best_paths:
-            print(f"Best path from {start} to {best_path[-1]}: {best_path}")
-            coordinates = [(nodepl.loc[i, "long"], nodepl.loc[i, "lat"]) for i in best_path]
+            print(f"Best path from {start} to {best_path[0][-1]}: {best_path[0]}")
+            coordinates = [(nodepl.loc[i, "long"], nodepl.loc[i, "lat"]) for i in best_path[0]]
             folium.PolyLine(coordinates, color="blue", weight=2.5, opacity=1).add_to(m)
         m.save("map.html")
 
